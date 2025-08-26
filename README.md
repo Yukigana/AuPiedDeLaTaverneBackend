@@ -23,7 +23,7 @@ LOG_LEVEL=debug npm start
 
 # Critical level only (sensitive production mode)
 LOG_LEVEL=crit npm start
-
+```
 
 ## Analytics Solution (not implemented)
 
