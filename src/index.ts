@@ -2,13 +2,16 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import tablesRoutes from "./routes/table.js";
+import authRoutes from "./routes/auth.js";
+import tableRoutes from "./routes/table.js";
 
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
-
+app.use("/auth", authRoutes);
+app.use("/table", tableRoutes);
 // Routes
 app.use("/table", tablesRoutes);
 
