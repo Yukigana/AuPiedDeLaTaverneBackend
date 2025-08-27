@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Table from "../models/Table.js";
 import { verifyToken, AuthRequest } from "../middleware/authMiddleware.js";
-import logger from "../config/logger.js"
+import logger from "../config/logger.js";
 
 const router = Router();
 
@@ -14,7 +14,7 @@ router.get("/", async (_req, res) => {
     logger.info("Récupération de toutes les tables");
     res.json(tables);
   } catch (err: any) {
-    logger.error(err.message);
+    logger.error("Erreur récupération tables: " + err.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
@@ -32,22 +32,32 @@ router.post("/", verifyToken, async (req: AuthRequest, res) => {
       restrictedToAdherents,
     } = req.body;
 
-    // Vérification des champs obligatoires
-    if (!name || !maxPlayers || !sessionDate) {
-      logger.warn("Champs requis manquants pour création table");
-      return res.status(400).json({ error: "Champs requis manquants" });
+    // Validation manuelle
+    if (!name || name.trim().length < 3) {
+      logger.warn("Nom de table invalide");
+      return res
+        .status(400)
+        .json({ error: "Nom obligatoire (min 3 caractères)" });
+    }
+    if (!maxPlayers || isNaN(maxPlayers) || maxPlayers < 1) {
+      logger.warn("Nombre de joueurs invalide");
+      return res.status(400).json({ error: "Nombre de joueurs invalide" });
+    }
+    if (!sessionDate || isNaN(Date.parse(sessionDate))) {
+      logger.warn("Date de session invalide");
+      return res.status(400).json({ error: "Date de session invalide" });
     }
 
     // Le MJ = utilisateur connecté (issu du JWT)
     const mjId = req.user.id;
 
     const table = new Table({
-      name,
+      name: name.trim(),
       description,
       mj: mjId,
       maxPlayers,
       sessionDate,
-      restrictedToAdherents,
+      restrictedToAdherents: !!restrictedToAdherents,
       players: [],
     });
 
@@ -55,7 +65,21 @@ router.post("/", verifyToken, async (req: AuthRequest, res) => {
     logger.info(`Table créée: ${table._id} par MJ: ${mjId}`);
     res.status(201).json(table);
   } catch (err: any) {
-    logger.error(err.message);
+    logger.error("Erreur création table: " + err.message);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+// --------------------
+// Récupérer MES tables (protégé)
+// --------------------
+router.get("/mine", verifyToken, async (req: AuthRequest, res) => {
+  try {
+    const tables = await Table.find({ mj: req.user.id }).populate("players");
+    logger.info(`Tables récupérées pour MJ: ${req.user.id}`);
+    res.json(tables);
+  } catch (err: any) {
+    logger.error("Erreur récupération tables perso: " + err.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
@@ -75,7 +99,9 @@ router.post("/:id/players", verifyToken, async (req: AuthRequest, res) => {
 
     // Vérifier si déjà inscrit
     if (table.players.includes(userId)) {
-      logger.warn(`Utilisateur déjà inscrit: ${userId} à la table: ${req.params.id}`);
+      logger.warn(
+        `Utilisateur déjà inscrit: ${userId} à la table: ${req.params.id}`
+      );
       return res
         .status(400)
         .json({ error: "Vous êtes déjà inscrit à cette table" });
@@ -93,7 +119,7 @@ router.post("/:id/players", verifyToken, async (req: AuthRequest, res) => {
     logger.info(`Utilisateur: ${userId} a rejoint la table: ${req.params.id}`);
     res.json(table);
   } catch (err: any) {
-    logger.error(err.message);
+    logger.error("Erreur ajout joueur: " + err.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
