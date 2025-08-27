@@ -5,8 +5,10 @@ import User from "../models/User.js";
 import Role from "../models/Role.js";
 import logger from "../config/logger.js"
 
+import dotenv from "dotenv";
+
+dotenv.config();
 const router = Router();
-const JWT_SECRET = "tonSecretUltraSecurise"; // ⚠️ à mettre dans .env
 
 // ----------------- REGISTER -----------------
 router.post("/register", async (req, res) => {
@@ -67,7 +69,7 @@ router.post("/login", async (req, res) => {
       logger.warn(`Échec de connexion, mot de passe incorrect pour email: ${email}`);
       return res.status(400).json({ error: "Identifiants invalides" });}
 
-    const token = jwt.sign({ id: user._id, roles: user.roles }, JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, roles: user.roles }, process.env.JWT_SECRET!, {
       expiresIn: "7d",
     });
 
@@ -95,7 +97,7 @@ router.get("/me", async (req, res) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
     const user = await User.findById(decoded.id)
       .select("-password")
       .populate("roles");
