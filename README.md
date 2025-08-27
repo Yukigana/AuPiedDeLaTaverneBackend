@@ -62,12 +62,9 @@ Créer un fichier `.env` à la racine :
 ```env
 MONGO_URI=mongodb://localhost:27017/jdr
 LOG_LEVEL=info
-JWT_SECRET=tonSecretUltraSecurise
-MONGO_URI : URI MongoDB
+JWT_SECRET=SECRET_KEY
 
 LOG_LEVEL : crit | error | warn | info | debug (défaut: info)
-
-JWT_SECRET : secret pour signer les JWT (à changer en prod)
 
 🚀 Installation & Lancement
 bash
