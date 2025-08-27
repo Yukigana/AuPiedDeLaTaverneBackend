@@ -4,6 +4,7 @@ import cors from "cors";
 import tablesRoutes from "./routes/table.js";
 import authRoutes from "./routes/auth.js";
 import tableRoutes from "./routes/table.js";
+import logger from "./config/logger.js";
 
 const app = express();
 
@@ -19,12 +20,15 @@ app.use("/table", tablesRoutes);
 const start = async () => {
   try {
     await mongoose.connect("mongodb://localhost:27017/jdr");
+    logger.info("MongoDB connecté");
     console.log("MongoDB connecté");
 
     app.listen(5000, () => {
+      logger.info("Serveur lancé sur http://localhost:5000");
       console.log("Serveur lancé sur http://localhost:5000");
     });
   } catch (err) {
+    logger.crit(`Erreur MongoDB: ${err}`);
     console.error("Erreur MongoDB:", err);
   }
 };

@@ -3,10 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Role from "../models/Role.js";
-import { log } from "console";
+import logger from "../config/logger.js"
 
 const router = Router();
-const logger = require ('./src/config/logger')
 const JWT_SECRET = "tonSecretUltraSecurise"; // ⚠️ à mettre dans .env
 
 // ----------------- REGISTER -----------------

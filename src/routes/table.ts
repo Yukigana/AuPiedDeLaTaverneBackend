@@ -1,9 +1,9 @@
 import { Router } from "express";
 import Table from "../models/Table.js";
 import { verifyToken, AuthRequest } from "../middleware/authMiddleware.js";
+import logger from "../config/logger.js"
 
 const router = Router();
-const logger = require ('./src/config/logger')
 
 // --------------------
 // Récupérer toutes les tables (public)
