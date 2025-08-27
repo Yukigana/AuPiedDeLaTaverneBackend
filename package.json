@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsc && nodemon dist/index.js",
+    "seed": "tsc && node dist/seed.js",
     "build": "tsc",
     "start": "node dist/index.js"
   },
