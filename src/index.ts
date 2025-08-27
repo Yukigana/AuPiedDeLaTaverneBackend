@@ -5,7 +5,9 @@ import tablesRoutes from "./routes/table.js";
 import authRoutes from "./routes/auth.js";
 import tableRoutes from "./routes/table.js";
 import logger from "./config/logger.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
 
 // Middlewares
@@ -19,7 +21,7 @@ app.use("/table", tablesRoutes);
 // Connexion MongoDB
 const start = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/jdr");
+    await mongoose.connect(process.env.MONGO_URI!);
     logger.info("MongoDB connecté");
 
     app.listen(5000, () => {
